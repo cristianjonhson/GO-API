@@ -29,6 +29,21 @@ Colección de ejercicios prácticos para aprender los fundamentos de programaci�
 - **ordenamiento.go** - Implementa Bubble Sort
 - **busqueda.go** - Implementa búsqueda lineal y binaria
 
+### 6. Funciones (Modularidad)
+- **refactorizacion.go** - Refactoriza ejercicios usando funciones reutilizables
+- **validador.go** - Sistema de validación con funciones de rango
+
+### 7. Structs y Métodos
+- **agenda.go** - Agenda de contactos con CRUD completo
+- **carrito.go** - Carrito de compras con productos, totales y descuentos
+
+### 8. Maps (Diccionarios)
+- **inventario.go** - Sistema de inventario con gestión de stock
+
+### 9. Manejo de Errores
+- **parser.go** - Parser seguro con conversión de strings a números
+- **divisor.go** - Calculadora con manejo robusto de errores
+
 ## 🎯 Objetivos de Aprendizaje
 
 Estos ejercicios te ayudarán a practicar:
@@ -37,9 +52,13 @@ Estos ejercicios te ayudarán a practicar:
 - ✅ Entrada/salida de datos
 - ✅ Manejo de strings
 - ✅ Arrays y slices
-- ✅ Funciones
+- ✅ Funciones y modularidad
+- ✅ Structs y métodos
+- ✅ Maps (diccionarios)
+- ✅ Manejo de errores
 - ✅ Algoritmos básicos
 - ✅ Validación de datos
+- ✅ Sistemas CRUD
 
 ## 🏃 Cómo Ejecutar
 
@@ -82,10 +101,21 @@ ejercicios/
 │   ├── vocales-consonantes.go
 │   ├── palindromo.go
 │   └── frecuencia-palabras.go
-└── 05-arrays-slices/
-    ├── estadisticas.go
-    ├── ordenamiento.go
-    └── busqueda.go
+├── 05-arrays-slices/
+│   ├── estadisticas.go
+│   ├── ordenamiento.go
+│   └── busqueda.go
+├── 06-funciones/
+│   ├── refactorizacion.go
+│   └── validador.go
+├── 07-structs/
+│   ├── agenda.go
+│   └── carrito.go
+├── 08-maps/
+│   └── inventario.go
+└── 09-errores/
+    ├── parser.go
+    └── divisor.go
 ```
 
 ## 🎓 Recursos Adicionales
