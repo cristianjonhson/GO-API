@@ -44,6 +44,19 @@ Colección de ejercicios prácticos para aprender los fundamentos de programaci�
 - **parser.go** - Parser seguro con conversión de strings a números
 - **divisor.go** - Calculadora con manejo robusto de errores
 
+### 10. Archivos (Persistencia)
+- **agenda-json.go** - Agenda de contactos con persistencia en JSON
+- **logging.go** - Sistema de logging de operaciones con timestamps
+
+### 11. Testing (Confiabilidad)
+- **funciones.go** - Funciones puras para testing
+- **funciones_test.go** - Tests unitarios con casos borde y benchmarks
+
+### 12. Concurrencia (Goroutines + Channels)
+- **descarga-simulada.go** - Simulación de descargas concurrentes
+- **procesador-numeros.go** - Pipeline producer-workers-consumer
+- **pool-workers.go** - Pool de workers procesando tareas
+
 ## 🎯 Objetivos de Aprendizaje
 
 Estos ejercicios te ayudarán a practicar:
@@ -56,9 +69,13 @@ Estos ejercicios te ayudarán a practicar:
 - ✅ Structs y métodos
 - ✅ Maps (diccionarios)
 - ✅ Manejo de errores
+- ✅ Persistencia de datos (archivos)
+- ✅ Testing unitario
+- ✅ Concurrencia (goroutines y channels)
 - ✅ Algoritmos básicos
 - ✅ Validación de datos
 - ✅ Sistemas CRUD
+- ✅ Patrones de diseño (producer-consumer, worker pool)
 
 ## 🏃 Cómo Ejecutar
 
@@ -72,6 +89,16 @@ go run perfil.go
 # Ejemplo: Ejecutar el juego de adivinar número
 cd ejercicios/03-bucles
 go run adivina-numero.go
+
+# Ejemplo: Ejecutar tests unitarios
+cd ejercicios/11-testing
+go test -v
+
+# Ejemplo: Ejecutar con coverage
+go test -v -cover
+
+# Ejemplo: Ejecutar benchmarks
+go test -bench=.
 ```
 
 ## 💡 Consejos
@@ -80,6 +107,14 @@ go run adivina-numero.go
 2. **Experimenta** - Modifica el código y observa los cambios
 3. **Progresivo** - Sigue el orden sugerido para mejor comprensión
 4. **Práctica** - Intenta resolver cada ejercicio antes de ver la solución
+5. **Testing** - Ejecuta los tests para validar tu código
+6. **Concurrencia** - Los ejercicios de goroutines son avanzados, tómate tu tiempo
+
+## 🎓 Niveles de Dificultad
+
+- **Básico** (01-05): Variables, condicionales, bucles, strings, arrays
+- **Intermedio** (06-09): Funciones, structs, maps, manejo de errores
+- **Avanzado** (10-12): Persistencia, testing, concurrencia
 
 ## 📖 Estructura del Proyecto
 
@@ -113,9 +148,19 @@ ejercicios/
 │   └── carrito.go
 ├── 08-maps/
 │   └── inventario.go
-└── 09-errores/
-    ├── parser.go
-    └── divisor.go
+├── 09-errores/
+│   ├── parser.go
+│   └── divisor.go
+├── 10-archivos/
+│   ├── agenda-json.go
+│   └── logging.go
+├── 11-testing/
+│   ├── funciones.go
+│   └── funciones_test.go
+└── 12-concurrencia/
+    ├── descarga-simulada.go
+    ├── procesador-numeros.go
+    └── pool-workers.go
 ```
 
 ## 🎓 Recursos Adicionales
