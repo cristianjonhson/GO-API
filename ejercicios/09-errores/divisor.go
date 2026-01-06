@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+const errorFormat = "❌ Error: %v\n"
+
 func main() {
 	fmt.Println("=== CALCULADORA CON MANEJO DE ERRORES ===")
 
@@ -115,79 +117,102 @@ func potencia(base, exponente float64) (float64, error) {
 // ejecutarCalculadora ejecuta un menú interactivo de calculadora
 func ejecutarCalculadora() {
 	for {
-		fmt.Println("\nOperaciones disponibles:")
-		fmt.Println("1. División")
-		fmt.Println("2. Raíz cuadrada")
-		fmt.Println("3. Calcular porcentaje")
-		fmt.Println("4. Potencia")
-		fmt.Println("5. Salir")
-
-		var opcion int
-		fmt.Print("\nSelecciona una operación: ")
-		fmt.Scanln(&opcion)
+		opcion := mostrarMenuYObtenerOpcion()
 
 		if opcion == 5 {
 			fmt.Println("¡Hasta luego! 👋")
 			return
 		}
 
-		switch opcion {
-		case 1:
-			// División
-			var a, b float64
-			fmt.Print("Dividendo: ")
-			fmt.Scanln(&a)
-			fmt.Print("Divisor: ")
-			fmt.Scanln(&b)
+		ejecutarOperacion(opcion)
+	}
+}
 
-			if resultado, err := dividir(a, b); err != nil {
-				fmt.Printf("❌ Error: %v\n", err)
-			} else {
-				fmt.Printf("✓ Resultado: %.2f ÷ %.2f = %.2f\n", a, b, resultado)
-			}
+// mostrarMenuYObtenerOpcion muestra el menú y retorna la opción seleccionada
+func mostrarMenuYObtenerOpcion() int {
+	fmt.Println("\nOperaciones disponibles:")
+	fmt.Println("1. División")
+	fmt.Println("2. Raíz cuadrada")
+	fmt.Println("3. Calcular porcentaje")
+	fmt.Println("4. Potencia")
+	fmt.Println("5. Salir")
 
-		case 2:
-			// Raíz cuadrada
-			var n float64
-			fmt.Print("Número: ")
-			fmt.Scanln(&n)
+	var opcion int
+	fmt.Print("\nSelecciona una operación: ")
+	fmt.Scanln(&opcion)
+	return opcion
+}
 
-			if resultado, err := raizCuadrada(n); err != nil {
-				fmt.Printf("❌ Error: %v\n", err)
-			} else {
-				fmt.Printf("✓ Resultado: √%.2f = %.2f\n", n, resultado)
-			}
+// ejecutarOperacion ejecuta la operación seleccionada
+func ejecutarOperacion(opcion int) {
+	switch opcion {
+	case 1:
+		operacionDivision()
+	case 2:
+		operacionRaizCuadrada()
+	case 3:
+		operacionPorcentaje()
+	case 4:
+		operacionPotencia()
+	default:
+		fmt.Println("❌ Opción inválida")
+	}
+}
 
-		case 3:
-			// Porcentaje
-			var parte, total float64
-			fmt.Print("Parte: ")
-			fmt.Scanln(&parte)
-			fmt.Print("Total: ")
-			fmt.Scanln(&total)
+// operacionDivision ejecuta la operación de división
+func operacionDivision() {
+	var a, b float64
+	fmt.Print("Dividendo: ")
+	fmt.Scanln(&a)
+	fmt.Print("Divisor: ")
+	fmt.Scanln(&b)
 
-			if resultado, err := calcularPorcentaje(parte, total); err != nil {
-				fmt.Printf("❌ Error: %v\n", err)
-			} else {
-				fmt.Printf("✓ %.2f es el %.2f%% de %.2f\n", parte, resultado, total)
-			}
+	if resultado, err := dividir(a, b); err != nil {
+		fmt.Printf(errorFormat, err)
+	} else {
+		fmt.Printf("✓ Resultado: %.2f ÷ %.2f = %.2f\n", a, b, resultado)
+	}
+}
 
-		case 4:
-			// Potencia
-			var base, exponente float64
-			fmt.Print("Base: ")
-			fmt.Scanln(&base)
-			fmt.Print("Exponente: ")
-			fmt.Scanln(&exponente)
+// operacionRaizCuadrada ejecuta la operación de raíz cuadrada
+func operacionRaizCuadrada() {
+	var n float64
+	fmt.Print("Número: ")
+	fmt.Scanln(&n)
 
-			if resultado, err := potencia(base, exponente); err != nil {
-				fmt.Printf("❌ Error: %v\n", err)
-			} else {
-				fmt.Printf("✓ %.2f^%.2f = %.2f\n", base, exponente, resultado)
-			}
+	if resultado, err := raizCuadrada(n); err != nil {
+		fmt.Printf(errorFormat, err)
+	} else {
+		fmt.Printf("✓ Resultado: √%.2f = %.2f\n", n, resultado)
+	}
+}
 
-		default:
-			fmt.Println("❌ Opción inválida")
-		}
+// operacionPorcentaje ejecuta la operación de cálculo de porcentaje
+func operacionPorcentaje() {
+	var parte, total float64
+	fmt.Print("Parte: ")
+	fmt.Scanln(&parte)
+	fmt.Print("Total: ")
+	fmt.Scanln(&total)
+
+	if resultado, err := calcularPorcentaje(parte, total); err != nil {
+		fmt.Printf(errorFormat, err)
+	} else {
+		fmt.Printf("✓ %.2f es el %.2f%% de %.2f\n", parte, resultado, total)
+	}
+}
+
+// operacionPotencia ejecuta la operación de potencia
+func operacionPotencia() {
+	var base, exponente float64
+	fmt.Print("Base: ")
+	fmt.Scanln(&base)
+	fmt.Print("Exponente: ")
+	fmt.Scanln(&exponente)
+
+	if resultado, err := potencia(base, exponente); err != nil {
+		fmt.Printf(errorFormat, err)
+	} else {
+		fmt.Printf("✓ %.2f^%.2f = %.2f\n", base, exponente, resultado)
 	}
 }
