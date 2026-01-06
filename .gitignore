@@ -1,0 +1,57 @@
+# Binarios compilados
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Archivos de test
+*.test
+
+# Archivos de salida
+*.out
+
+# Binario del programa
+main
+app
+*.bin
+
+# Dependencias
+vendor/
+go.sum
+
+# IDEs y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Archivos de configuración local
+*.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Archivos temporales
+tmp/
+temp/
+*.tmp
+
+# Coverage
+*.coverprofile
+coverage.txt
+coverage.out
+coverage.html
+
+# Build artifacts
+dist/
+build/
+
+# Air (live reload)
+tmp/
+.air.toml
