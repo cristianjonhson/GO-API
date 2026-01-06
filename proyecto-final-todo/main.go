@@ -1,6 +1,55 @@
-// Proyecto Final: Sistema de Gestión de Tareas (ToDo CLI)
-// Integra todos los conceptos: structs, persistencia, errores, testing, concurrencia
-
+// Package main implementa un sistema completo de gestión de tareas desde línea de comandos.
+//
+// El sistema proporciona operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para tareas,
+// con persistencia en archivos JSON, validaciones de entrada, manejo robusto de errores,
+// y guardado automático mediante concurrencia con goroutines.
+//
+// # Características principales
+//
+//   - CRUD completo de tareas con validaciones
+//   - Persistencia automática en formato JSON
+//   - Búsqueda por ID o texto (case-insensitive)
+//   - Filtrado por estado (completadas/pendientes)
+//   - Estadísticas en tiempo real
+//   - Autoguardado periódico con goroutines
+//   - Interfaz CLI interactiva con menú
+//
+// # Uso básico
+//
+// Crear un gestor y realizar operaciones:
+//
+//	gestor, err := NuevoGestorTareas("tareas.json")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	// Crear una tarea
+//	tarea, err := gestor.Crear("Estudiar concurrencia en Go")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	// Listar tareas pendientes
+//	pendientes := gestor.ListarPendientes()
+//	for _, t := range pendientes {
+//		fmt.Printf("[%d] %s\n", t.ID, t.Titulo)
+//	}
+//
+//	// Completar una tarea
+//	err = gestor.Completar(tarea.ID)
+//
+//	// Guardar cambios
+//	err = gestor.Guardar()
+//
+// # Autoguardado
+//
+// El sistema soporta guardado automático periódico:
+//
+//	detener := make(chan bool)
+//	gestor.IniciarAutoguardado(30*time.Second, detener)
+//	// ... operaciones ...
+//	detener <- true  // Detener cuando termine
+//
 package main
 
 import (
@@ -12,24 +61,78 @@ import (
 	"time"
 )
 
-// Tarea representa una tarea individual en el sistema
+// Tarea representa una tarea individual en el sistema de gestión.
+//
+// Cada tarea contiene un identificador único auto-incremental, un título
+// descriptivo que debe cumplir validaciones de longitud (3-100 caracteres),
+// un estado de completitud booleano, y un timestamp de creación.
+//
+// Las tareas se serializan a JSON para persistencia usando los tags json.
 type Tarea struct {
+	// ID es el identificador único auto-incremental de la tarea.
+	// Los IDs se asignan secuencialmente y nunca se reutilizan.
 	ID            int       `json:"id"`
+	
+	// Titulo es la descripción de la tarea.
+	// Debe tener entre 3 y 100 caracteres y no puede estar vacío.
 	Titulo        string    `json:"titulo"`
+	
+	// Completada indica si la tarea ha sido marcada como finalizada.
+	// Las tareas nuevas siempre comienzan con false.
 	Completada    bool      `json:"completada"`
+	
+	// FechaCreacion es el timestamp UTC de cuando se creó la tarea.
+	// Se asigna automáticamente al crear la tarea.
 	FechaCreacion time.Time `json:"fecha_creacion"`
 }
 
-// GestorTareas maneja la colección de tareas y su persistencia
+// GestorTareas maneja la colección de tareas y su persistencia en disco.
+//
+// Este tipo es el núcleo del sistema, encapsulando todas las operaciones
+// sobre tareas (CRUD), la persistencia en JSON, y el control del autoguardado.
+//
+// Los campos no exportados garantizan la integridad de los datos y evitan
+// modificaciones directas desde código externo.
+//
+// Todas las operaciones que modifican tareas son thread-safe cuando se usan
+// correctamente con el autoguardado.
 type GestorTareas struct {
+	// tareas almacena la colección completa de tareas en memoria
 	tareas         []Tarea
+	
+	// archivoRuta es la ruta del archivo JSON donde se persisten las tareas
 	archivoRuta    string
+	
+	// proximoID es el siguiente ID disponible para asignar a nuevas tareas
 	proximoID      int
+	
+	// cambiosPendientes indica si hay modificaciones sin guardar en disco
 	cambiosPendientes bool
+	
+	// autoguardadoActivo indica si el goroutine de autoguardado está ejecutándose
 	autoguardadoActivo bool
 }
 
-// NuevoGestorTareas crea un nuevo gestor de tareas
+// NuevoGestorTareas crea un nuevo gestor de tareas con persistencia en archivo.
+//
+// Si el archivo especificado existe, carga automáticamente las tareas desde él
+// y actualiza el próximo ID para evitar colisiones. Si el archivo no existe,
+// crea un gestor vacío que creará el archivo en el primer guardado.
+//
+// Parámetros:
+//   - archivoRuta: ruta del archivo JSON para persistencia (ej: "tareas.json")
+//
+// Retorna:
+//   - *GestorTareas: puntero al gestor creado y listo para usar
+//   - error: error si hay problemas leyendo/parseando el archivo existente
+//
+// Ejemplo:
+//
+//	gestor, err := NuevoGestorTareas("mis_tareas.json")
+//	if err != nil {
+//		return err
+//	}
+//
 func NuevoGestorTareas(archivoRuta string) (*GestorTareas, error) {
 	gestor := &GestorTareas{
 		tareas:         []Tarea{},
@@ -50,7 +153,23 @@ func NuevoGestorTareas(archivoRuta string) (*GestorTareas, error) {
 	return gestor, nil
 }
 
-// Guardar escribe las tareas en el archivo JSON
+// Guardar persiste todas las tareas en el archivo JSON configurado.
+//
+// Serializa la colección completa de tareas a JSON con indentación para
+// legibilidad y sobrescribe el archivo completo. Si el guardado es exitoso,
+// resetea la bandera de cambios pendientes.
+//
+// El archivo se crea con permisos 0644 (lectura para todos, escritura para dueño).
+//
+// Retorna:
+//   - error: error si falla la serialización o escritura del archivo
+//
+// Ejemplo:
+//
+//	if err := gestor.Guardar(); err != nil {
+//		log.Printf("Error al guardar: %v", err)
+//	}
+//
 func (g *GestorTareas) Guardar() error {
 	datos, err := json.MarshalIndent(g.tareas, "", "  ")
 	if err != nil {
@@ -66,7 +185,21 @@ func (g *GestorTareas) Guardar() error {
 	return nil
 }
 
-// Cargar lee las tareas desde el archivo JSON
+// Cargar lee y deserializa las tareas desde el archivo JSON.
+//
+// Lee el archivo completo, parsea el JSON a la estructura de tareas,
+// y actualiza el próximo ID basándose en el ID más alto encontrado.
+// Imprime un mensaje confirmando cuántas tareas se cargaron.
+//
+// Esta función se llama automáticamente por NuevoGestorTareas, pero puede
+// invocarse manualmente para recargar tareas desde disco.
+//
+// Retorna:
+//   - error: error si el archivo no existe, no se puede leer, o el JSON es inválido
+//
+// Nota: Si el archivo no existe, retorna os.IsNotExist error que puede
+// manejarse con os.IsNotExist(err).
+//
 func (g *GestorTareas) Cargar() error {
 	datos, err := ioutil.ReadFile(g.archivoRuta)
 	if err != nil {
@@ -89,7 +222,27 @@ func (g *GestorTareas) Cargar() error {
 	return nil
 }
 
-// ValidarTitulo valida que el título de una tarea sea correcto
+// ValidarTitulo valida que el título de una tarea cumpla todos los requisitos.
+//
+// El título se considera válido si:
+//   - No está vacío después de eliminar espacios en blanco
+//   - Tiene al menos 3 caracteres
+//   - No excede los 100 caracteres
+//
+// Esta función se usa internamente por Crear antes de añadir una nueva tarea.
+//
+// Parámetros:
+//   - titulo: el título a validar (puede contener espacios al inicio/fin)
+//
+// Retorna:
+//   - error: error descriptivo si la validación falla, nil si es válido
+//
+// Ejemplo:
+//
+//	if err := ValidarTitulo("Comprar leche"); err != nil {
+//		fmt.Println("Título inválido:", err)
+//	}
+//
 func ValidarTitulo(titulo string) error {
 	titulo = strings.TrimSpace(titulo)
 	
@@ -108,7 +261,29 @@ func ValidarTitulo(titulo string) error {
 	return nil
 }
 
-// Crear añade una nueva tarea
+// Crear añade una nueva tarea a la colección con el título especificado.
+//
+// Valida el título usando ValidarTitulo, asigna un ID único auto-incremental,
+// establece el estado como no completada, y registra el timestamp de creación.
+// Los espacios en blanco al inicio/fin del título se eliminan automáticamente.
+//
+// Marca el gestor como teniendo cambios pendientes para el autoguardado.
+//
+// Parámetros:
+//   - titulo: descripción de la tarea (se validará longitud)
+//
+// Retorna:
+//   - *Tarea: puntero a la tarea recién creada
+//   - error: error si la validación del título falla
+//
+// Ejemplo:
+//
+//	tarea, err := gestor.Crear("Estudiar goroutines")
+//	if err != nil {
+//		return err
+//	}
+//	fmt.Printf("Tarea creada con ID: %d\n", tarea.ID)
+//
 func (g *GestorTareas) Crear(titulo string) (*Tarea, error) {
 	// Validamos el título
 	if err := ValidarTitulo(titulo); err != nil {
@@ -129,12 +304,33 @@ func (g *GestorTareas) Crear(titulo string) (*Tarea, error) {
 	return &tarea, nil
 }
 
-// Listar retorna todas las tareas
+// Listar retorna todas las tareas sin filtrar.
+//
+// Devuelve una copia del slice de tareas, incluyendo tanto completadas
+// como pendientes, en el orden en que fueron creadas.
+//
+// Retorna:
+//   - []Tarea: slice con todas las tareas (puede estar vacío)
+//
+// Ver también: ListarPendientes, ListarCompletadas
+//
 func (g *GestorTareas) Listar() []Tarea {
 	return g.tareas
 }
 
-// ListarPendientes retorna solo las tareas no completadas
+// ListarPendientes retorna solo las tareas que no han sido completadas.
+//
+// Filtra la colección completa y retorna únicamente las tareas con
+// Completada == false.
+//
+// Retorna:
+//   - []Tarea: slice con tareas pendientes (vacío si no hay pendientes)
+//
+// Ejemplo:
+//
+//	pendientes := gestor.ListarPendientes()
+//	fmt.Printf("Tienes %d tareas pendientes\n", len(pendientes))
+//
 func (g *GestorTareas) ListarPendientes() []Tarea {
 	var pendientes []Tarea
 	for _, tarea := range g.tareas {
@@ -145,7 +341,19 @@ func (g *GestorTareas) ListarPendientes() []Tarea {
 	return pendientes
 }
 
-// ListarCompletadas retorna solo las tareas completadas
+// ListarCompletadas retorna solo las tareas que han sido marcadas como completadas.
+//
+// Filtra la colección completa y retorna únicamente las tareas con
+// Completada == true.
+//
+// Retorna:
+//   - []Tarea: slice con tareas completadas (vacío si no hay completadas)
+//
+// Ejemplo:
+//
+//	completadas := gestor.ListarCompletadas()
+//	fmt.Printf("Has completado %d tareas\n", len(completadas))
+//
 func (g *GestorTareas) ListarCompletadas() []Tarea {
 	var completadas []Tarea
 	for _, tarea := range g.tareas {
@@ -156,7 +364,27 @@ func (g *GestorTareas) ListarCompletadas() []Tarea {
 	return completadas
 }
 
-// BuscarPorID encuentra una tarea por su ID
+// BuscarPorID encuentra y retorna una tarea específica por su identificador único.
+//
+// Realiza una búsqueda lineal en la colección de tareas. Si encuentra
+// una tarea con el ID especificado, retorna un puntero a ella.
+//
+// Parámetros:
+//   - id: el identificador único de la tarea a buscar
+//
+// Retorna:
+//   - *Tarea: puntero a la tarea encontrada
+//   - error: error si no existe ninguna tarea con ese ID
+//
+// Ejemplo:
+//
+//	tarea, err := gestor.BuscarPorID(5)
+//	if err != nil {
+//		fmt.Println("Tarea no encontrada")
+//	} else {
+//		fmt.Println("Tarea:", tarea.Titulo)
+//	}
+//
 func (g *GestorTareas) BuscarPorID(id int) (*Tarea, error) {
 	for i := range g.tareas {
 		if g.tareas[i].ID == id {
@@ -166,7 +394,27 @@ func (g *GestorTareas) BuscarPorID(id int) (*Tarea, error) {
 	return nil, fmt.Errorf("tarea con ID %d no encontrada", id)
 }
 
-// BuscarPorTexto encuentra tareas que contengan el texto en su título
+// BuscarPorTexto encuentra todas las tareas cuyos títulos contengan el texto especificado.
+//
+// Realiza una búsqueda case-insensitive (no distingue mayúsculas/minúsculas)
+// en todos los títulos de tareas. Retorna todas las coincidencias encontradas.
+//
+// Si el texto está vacío, retorna todas las tareas.
+//
+// Parámetros:
+//   - texto: el texto a buscar en los títulos (case-insensitive)
+//
+// Retorna:
+//   - []Tarea: slice con todas las tareas que contienen el texto (puede estar vacío)
+//
+// Ejemplo:
+//
+//	resultados := gestor.BuscarPorTexto("comprar")
+//	fmt.Printf("Se encontraron %d tareas\n", len(resultados))
+//	for _, t := range resultados {
+//		fmt.Printf("  - %s\n", t.Titulo)
+//	}
+//
 func (g *GestorTareas) BuscarPorTexto(texto string) []Tarea {
 	var encontradas []Tarea
 	textoBusqueda := strings.ToLower(texto)
@@ -180,7 +428,27 @@ func (g *GestorTareas) BuscarPorTexto(texto string) []Tarea {
 	return encontradas
 }
 
-// Completar marca una tarea como completada
+// Completar marca una tarea específica como completada.
+//
+// Busca la tarea por su ID y establece su campo Completada en true.
+// Verifica que la tarea no esté ya completada para evitar operaciones redundantes.
+//
+// Marca el gestor como teniendo cambios pendientes para el autoguardado.
+//
+// Parámetros:
+//   - id: el identificador único de la tarea a completar
+//
+// Retorna:
+//   - error: error si el ID no existe o la tarea ya está completada
+//
+// Ejemplo:
+//
+//	if err := gestor.Completar(3); err != nil {
+//		fmt.Println("Error:", err)
+//	} else {
+//		fmt.Println("Tarea completada exitosamente")
+//	}
+//
 func (g *GestorTareas) Completar(id int) error {
 	for i := range g.tareas {
 		if g.tareas[i].ID == id {
@@ -195,7 +463,27 @@ func (g *GestorTareas) Completar(id int) error {
 	return fmt.Errorf("tarea con ID %d no encontrada", id)
 }
 
-// Eliminar remueve una tarea de la lista
+// Eliminar remueve permanentemente una tarea de la colección.
+//
+// Busca la tarea por su ID y la elimina del slice. Esta operación
+// es irreversible y el ID eliminado no se reutiliza.
+//
+// Marca el gestor como teniendo cambios pendientes para el autoguardado.
+//
+// Parámetros:
+//   - id: el identificador único de la tarea a eliminar
+//
+// Retorna:
+//   - error: error si no existe ninguna tarea con ese ID
+//
+// Ejemplo:
+//
+//	if err := gestor.Eliminar(7); err != nil {
+//		fmt.Println("No se pudo eliminar:", err)
+//	} else {
+//		fmt.Println("Tarea eliminada")
+//	}
+//
 func (g *GestorTareas) Eliminar(id int) error {
 	for i := range g.tareas {
 		if g.tareas[i].ID == id {
@@ -207,7 +495,22 @@ func (g *GestorTareas) Eliminar(id int) error {
 	return fmt.Errorf("tarea con ID %d no encontrada", id)
 }
 
-// Estadisticas retorna estadísticas de las tareas
+// Estadisticas calcula y retorna estadísticas sobre las tareas.
+//
+// Recorre todas las tareas y cuenta el total, cuántas están completadas,
+// y cuántas están pendientes. Es útil para mostrar resúmenes al usuario.
+//
+// Retorna (retornos con nombre):
+//   - total: número total de tareas en la colección
+//   - completadas: número de tareas con Completada == true
+//   - pendientes: número de tareas con Completada == false
+//
+// Ejemplo:
+//
+//	total, completadas, pendientes := gestor.Estadisticas()
+//	fmt.Printf("Total: %d | Completadas: %d | Pendientes: %d\n",
+//		total, completadas, pendientes)
+//
 func (g *GestorTareas) Estadisticas() (total, completadas, pendientes int) {
 	total = len(g.tareas)
 	for _, tarea := range g.tareas {
@@ -220,7 +523,30 @@ func (g *GestorTareas) Estadisticas() (total, completadas, pendientes int) {
 	return
 }
 
-// IniciarAutoguardado inicia un goroutine que guarda automáticamente cada X segundos
+// IniciarAutoguardado inicia una goroutine que guarda automáticamente las tareas periódicamente.
+//
+// Crea un ticker que dispara cada intervalo especificado. En cada tick,
+// verifica si hay cambios pendientes y solo guarda si es necesario para
+// optimizar I/O. La goroutine se ejecuta en segundo plano hasta recibir
+// una señal por el canal detener.
+//
+// Solo puede haber un autoguardado activo a la vez. Llamadas adicionales
+// son ignoradas mientras hay uno en ejecución.
+//
+// Parámetros:
+//   - intervalo: frecuencia de guardado (ej: 30*time.Second para cada 30s)
+//   - detener: canal de solo lectura para señalizar terminación del autoguardado
+//
+// Ejemplo:
+//
+//	detener := make(chan bool)
+//	gestor.IniciarAutoguardado(30*time.Second, detener)
+//	defer func() { detener <- true }()
+//	// ... realizar operaciones ...
+//
+// Nota: Es responsabilidad del llamador cerrar o enviar señal por el canal
+// cuando desee detener el autoguardado.
+//
 func (g *GestorTareas) IniciarAutoguardado(intervalo time.Duration, detener <-chan bool) {
 	if g.autoguardadoActivo {
 		return
@@ -250,7 +576,23 @@ func (g *GestorTareas) IniciarAutoguardado(intervalo time.Duration, detener <-ch
 	}()
 }
 
-// MostrarTareas imprime una lista de tareas formateada
+// MostrarTareas imprime una lista de tareas con formato visual atractivo.
+//
+// Genera una salida formateada con emojis para el estado (✅ completada, ⬜ pendiente),
+// el ID, título y fecha de creación de cada tarea. Incluye un encabezado con el
+// título especificado y un resumen con el total de tareas mostradas.
+//
+// Si la lista está vacía, muestra un mensaje indicándolo.
+//
+// Parámetros:
+//   - tareas: slice de tareas a mostrar (puede estar vacío)
+//   - titulo: encabezado descriptivo para la lista (ej: "TAREAS PENDIENTES")
+//
+// Ejemplo:
+//
+//	pendientes := gestor.ListarPendientes()
+//	MostrarTareas(pendientes, "⬜ TAREAS POR HACER")
+//
 func MostrarTareas(tareas []Tarea, titulo string) {
 	if len(tareas) == 0 {
 		fmt.Printf("\n%s: No hay tareas\n", titulo)
