@@ -107,6 +107,17 @@ Esta carpeta contiene una guía completa de los fundamentos de Go, organizada en
     - Mocking
     - Cobertura
 
+12. **12-context.go** - Context ⭐ NUEVO
+    - Context básico (Background, TODO)
+    - WithCancel
+    - WithTimeout
+    - WithDeadline
+    - WithValue
+    - Propagación de context
+    - Worker pool con context
+    - Cancelación en cadena
+    - Mejores prácticas
+
 ## 🚀 Cómo usar estos archivos
 
 ### Ejecutar un archivo específico:
@@ -150,6 +161,7 @@ cat 02-tipos-datos.go
 
 5. **Avanzado:**
    - 10-concurrencia.go
+   - 12-context.go ⭐
    - 11-testing.go
 
 ## 💡 Consejos
@@ -165,6 +177,7 @@ cat 02-tipos-datos.go
 - [Go by Example](https://gobyexample.com/) - Ejemplos prácticos
 - [Effective Go](https://go.dev/doc/effective_go) - Guía de mejores prácticas
 - [Go Playground](https://go.dev/play/) - Ejecuta código en el navegador
+- [Context Package](https://pkg.go.dev/context) - Documentación oficial de context
 
 ## ✅ Verificación de aprendizaje
 
@@ -177,6 +190,7 @@ Después de estudiar estos archivos, deberías poder:
 - [ ] Organizar código en paquetes
 - [ ] Manejar errores correctamente
 - [ ] Usar goroutines y channels
+- [ ] Implementar cancelación con context ⭐
 - [ ] Escribir tests básicos
 
 ---
