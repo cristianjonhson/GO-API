@@ -245,6 +245,19 @@ Esta carpeta contiene una guía completa de los fundamentos de Go, organizada en
 
 ---
 
+### 13. **13-os.go** - Introducción al paquete os
+**¿Qué aprenderás?**
+- Leer variables de entorno
+- Listar archivos en un directorio
+- Crear y manejar archivos temporales
+
+**¿Para qué sirve?**
+- Entender cómo interactuar con el sistema operativo desde Go
+- Aprender a manejar archivos y directorios
+- Trabajar con variables de entorno para configuraciones dinámicas
+
+---
+
 ## 🚀 Cómo usar estos archivos
 
 ### Ejecutar un archivo específico:

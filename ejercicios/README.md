@@ -57,6 +57,9 @@ Colección de ejercicios prácticos para aprender los fundamentos de programaci�
 - **procesador-numeros.go** - Pipeline producer-workers-consumer
 - **pool-workers.go** - Pool de workers procesando tareas
 
+### 13. Introducción al paquete os
+- **13-os.go** - Aprende a interactuar con el sistema operativo: leer variables de entorno, listar archivos y crear archivos temporales.
+
 ## 🎯 Objetivos de Aprendizaje
 
 Estos ejercicios te ayudarán a practicar:
@@ -157,10 +160,12 @@ ejercicios/
 ├── 11-testing/
 │   ├── funciones.go
 │   └── funciones_test.go
-└── 12-concurrencia/
-    ├── descarga-simulada.go
-    ├── procesador-numeros.go
-    └── pool-workers.go
+├── 12-concurrencia/
+│   ├── descarga-simulada.go
+│   ├── procesador-numeros.go
+│   └── pool-workers.go
+└── 13-os/
+    └── 13-os.go
 ```
 
 ## 🎓 Recursos Adicionales
