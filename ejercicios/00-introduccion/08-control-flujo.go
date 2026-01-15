@@ -7,10 +7,21 @@ import "fmt"
 
 func main() {
     fmt.Println("=== CONTROL DE FLUJO EN GO ===\n")
+    
+    demostrarIfElse()
+    demostrarSwitch()
+    demostrarForLoops()
+    demostrarForRange()
+    demostrarGoto()
+    demostrarDefer()
+    demostrarBreakContinueLabels()
+    demostrarPatronesComunes()
+}
 
     // ==========================================
     // 1. IF / ELSE
     // ==========================================
+func demostrarIfElse() {
     fmt.Println("1. IF / ELSE:")
     edad := 20
 
@@ -35,10 +46,12 @@ func main() {
         fmt.Println("Reprobado")
     }
     fmt.Println()
+}
 
     // ==========================================
     // 2. SWITCH
     // ==========================================
+func demostrarSwitch() {
     fmt.Println("2. SWITCH:")
     
     // Switch básico
@@ -95,10 +108,12 @@ func main() {
         fmt.Printf("Tipo desconocido: %T\n", v)
     }
     fmt.Println()
+}
 
     // ==========================================
     // 3. FOR (único loop en Go)
     // ==========================================
+func demostrarForLoops() {
     fmt.Println("3. FOR LOOPS:")
 
     // For clásico (estilo C)
@@ -138,10 +153,12 @@ func main() {
         fmt.Print(i, " ")
     }
     fmt.Println("\n")
+}
 
     // ==========================================
     // 4. FOR RANGE (iteración sobre colecciones)
     // ==========================================
+func demostrarForRange() {
     fmt.Println("4. FOR RANGE:")
 
     // Range sobre slice
@@ -184,10 +201,12 @@ func main() {
         fmt.Printf("[%d]=%c ", i, runa)
     }
     fmt.Println("\n")
+}
 
     // ==========================================
     // 5. GOTO (no recomendado, evitar)
     // ==========================================
+func demostrarGoto() {
     fmt.Println("5. GOTO (uso excepcional):")
     x := 0
 loop:
@@ -197,20 +216,21 @@ loop:
         goto loop
     }
     fmt.Println()
+}
 
     // ==========================================
     // 6. DEFER
     // ==========================================
+func demostrarDefer() {
     fmt.Println("6. DEFER:")
     defer fmt.Println("Esto se ejecuta al final (defer 3)")
     defer fmt.Println("Esto se ejecuta antes (defer 2)")
     defer fmt.Println("Esto se ejecuta primero (defer 1)")
     fmt.Println("Código normal")
     fmt.Println()
+}
 
-    // ==========================================
-    // 7. BREAK Y CONTINUE CON LABELS
-    // ==========================================
+func demostrarBreakContinueLabels() {
     fmt.Println("7. BREAK/CONTINUE con labels:")
 outer:
     for i := 0; i < 3; i++ {
@@ -223,10 +243,12 @@ outer:
         }
     }
     fmt.Println()
+}
 
     // ==========================================
     // 8. PATRONES COMUNES
     // ==========================================
+func demostrarPatronesComunes() {
     fmt.Println("8. PATRONES COMUNES:")
 
     // Do-while simulado
