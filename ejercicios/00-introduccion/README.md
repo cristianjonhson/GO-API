@@ -429,3 +429,13 @@ Después de completar todos los archivos, intenta crear:
 **¡Buena suerte en tu viaje aprendiendo Go!** 🚀
 
 💡 **Tip Pro**: Go es un lenguaje simple pero poderoso. No intentes aplicar patrones de otros lenguajes. Abraza la simplicidad de Go.
+
+---
+
+## Ejercicios adicionales
+
+### 16. Manejo de cadenas
+### 17. Manejo de fechas y horas
+### 18. Lectura de entrada del usuario
+### 19. Uso de defer, panic y recover
+### 20. Lectura y escritura de archivos
