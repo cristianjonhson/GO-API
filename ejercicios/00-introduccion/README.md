@@ -258,6 +258,46 @@ Esta carpeta contiene una guía completa de los fundamentos de Go, organizada en
 
 ---
 
+### 14. **14-punteros.go** - Punteros y Referencias
+**¿Qué aprenderás?**
+- Definición de punteros
+- Operaciones con punteros
+- Dereferenciación
+- Punteros a structs
+- Punteros a funciones
+- Punteros y slices
+- Punteros y maps
+- Punteros y interfaces
+
+**¿Para qué sirve?**
+- Acceder a datos por referencia
+- Modificar valores por referencia
+- Comprender el comportamiento de punteros
+- Usar punteros en estructuras de datos
+- Implementar comportamiento personalizado
+
+---
+
+### 15. **15-goroutines-channels.go** - Goroutines y Canales
+**¿Qué aprenderás?**
+- Definición de goroutines
+- Canales de comunicación
+- Buffered channels
+- Select
+- WaitGroup
+- Mutex
+- Patrones comunes
+
+**¿Para qué sirve?**
+- Ejecutar múltiples tareas simultáneamente
+- Aprovechar múltiples núcleos del CPU
+- Mejorar rendimiento de aplicaciones
+- Procesar datos en paralelo
+- Implementar servidores concurrentes
+- Manejar operaciones I/O de forma eficiente
+
+---
+
 ## 🚀 Cómo usar estos archivos
 
 ### Ejecutar un archivo específico:
