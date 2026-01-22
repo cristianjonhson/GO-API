@@ -1,4 +1,6 @@
-// Ejemplo básico de manejo de JSON en Go
+// Este programa muestra cómo trabajar con JSON en Go.
+// Incluye ejemplos de serialización (convertir estructuras a JSON) y deserialización (convertir JSON a estructuras).
+
 package main
 
 import (

@@ -1,4 +1,6 @@
-// Ejemplo avanzado de goroutines con WaitGroup
+// Este programa muestra cómo usar goroutines con un WaitGroup para sincronizar su ejecución.
+// Un WaitGroup permite esperar a que un grupo de goroutines termine antes de continuar.
+
 package main
 
 import (

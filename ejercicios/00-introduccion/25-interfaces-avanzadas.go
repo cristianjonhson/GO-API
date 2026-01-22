@@ -1,3 +1,7 @@
+// Este programa muestra un ejemplo avanzado de interfaces en Go.
+// Se implementan dos estructuras (Círculo y Rectángulo) que cumplen con la interfaz "Forma".
+// La interfaz "Forma" define un método "Área" que es implementado por ambas estructuras.
+
 // Ejemplo avanzado de interfaces en Go
 package main
 
@@ -21,7 +25,6 @@ func (c Circulo) Area() float64 {
 
 func (r Rectangulo) Area() float64 {
 	return r.Ancho * r.Alto
-}
 }
 
 func imprimirArea(f Forma) {

@@ -1,4 +1,6 @@
-// Ejemplo básico de uso de canales con select
+// Este programa muestra cómo usar canales con la instrucción "select" en Go.
+// "select" permite esperar y manejar múltiples operaciones de canal al mismo tiempo.
+
 package main
 
 import (
