@@ -439,3 +439,8 @@ Después de completar todos los archivos, intenta crear:
 ### 18. Lectura de entrada del usuario
 ### 19. Uso de defer, panic y recover
 ### 20. Lectura y escritura de archivos
+### 21. Uso de paquetes externos
+### 22. JSON básico
+### 23. Goroutines avanzadas
+### 24. Canales con select
+### 25. Interfaces avanzadas
